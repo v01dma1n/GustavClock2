@@ -43,13 +43,13 @@ static float gustav_getHumidityData() { return GustavApp::getInstance().getHumid
 // Matches the original GustavClock sequence: date / time / temp / humidity.
 static const DisplayScene s_scenePlaylist[] = {
     { "Date",        "%Y-%m-%d",     MATRIX,       true,  false, 10000, 350,  50, &gustav_getTimeData     },
-    { "Time",        " %k. %M.  %S", SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
+    { "Time",        " %k. %M. %S",  SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
     { "Date",        "%b.%d %Y",     MATRIX,       true,  false, 10000, 350,  50, &gustav_getTimeData     },
-    { "Time",        " %k. %M.  %S", SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
-    { "Temperature", "T %3.0f F",    MATRIX,       false, false,  7000, 250,  40, &gustav_getTempData     },
-    { "Time",        " %k. %M.  %S", SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
-    { "Humidity",    "H %2.0f PCT",  MATRIX,       false, false,  7000, 250,  40, &gustav_getHumidityData },
-    { "Time",        " %k. %M.  %S", SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
+    { "Time",        " %k. %M. %S",  SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
+    { "Temperature", "  %3.0f F",    MATRIX,       false, false,  7000, 250,  40, &gustav_getTempData     },
+    { "Time",        " %k. %M. %S",  SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
+    { "Humidity",    "  %2.0f PCT",  MATRIX,       false, false,  7000, 250,  40, &gustav_getHumidityData },
+    { "Time",        " %k. %M. %S",  SLOT_MACHINE, true,  true,  10000, 200,  50, &gustav_getTimeData     },
 };
 static const int s_numScenes = static_cast<int>(sizeof(s_scenePlaylist) / sizeof(s_scenePlaylist[0]));
 
