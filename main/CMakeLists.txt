@@ -6,7 +6,6 @@ idf_component_register(
         "gustav_app.cpp"
         "gustav_preferences.cpp"
         "gustav_access_point_manager.cpp"
-        "gustav_weather_manager.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES

@@ -17,13 +17,11 @@
 #include "ds1307_driver.h"
 #include "gustav_preferences.h"
 #include "gustav_access_point_manager.h"
-#include "gustav_weather_manager.h"
-
 #include <memory>
 
 static constexpr const char* GUSTAV_HOST_NAME = "gustav-clock";
 
-class GustavApp : public BaseNtpClockApp {
+class GustavApp : public BaseNtpClockApp, public IWeatherClock {
 public:
     static GustavApp& getInstance();
 
@@ -51,6 +49,10 @@ public:
     bool isOkToRunScenes() const override;
     bool hasRtcTime()     const override { return _rtcAvailable; }
     void activateAccessPoint() override;
+
+    // --- IWeatherClock -------------------------------------------------------
+    const char* getOwmApiKey() const override { return _appPrefs.config.owm_api_key; }
+    const char* getOwmCity()   const override { return _appPrefs.config.owm_city; }
     void formatTime(char* txt, unsigned txt_size,
                     const char* format, time_t now) override;
 
@@ -68,7 +70,7 @@ private:
     bool                             _rtcAvailable = false;
     bool                             _rtcSynced    = false;
 
-    std::unique_ptr<GustavWeatherManager> _weatherManager;
+    std::unique_ptr<WeatherManager> _weatherManager;
 
     int64_t _apTriggerHeldSinceUs = 0;
 };

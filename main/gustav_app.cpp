@@ -12,7 +12,6 @@
 #include "esp_event.h"
 #include "esp_wifi.h"
 #include "sntp_client.h"
-#include "weather_client.h"
 
 #include <cstdio>
 #include <cstring>
@@ -137,7 +136,7 @@ void GustavApp::setupHardware() {
 void GustavApp::setup() {
     BaseNtpClockApp::setup();
 
-    _weatherManager = std::make_unique<GustavWeatherManager>(*this);
+    _weatherManager = std::make_unique<WeatherManager>(*this);
 
     if (_sceneManager) _sceneManager->setup(s_scenePlaylist, s_numScenes);
 
