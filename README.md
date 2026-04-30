@@ -1,6 +1,6 @@
 # "Bare Soul of My Circuit" aka. Gustav VFD Clock — ESP-IDF Port
 
-An ESP-IDF port of [GustavClock](https://github.com/v01dma1n/GustavClock) — a 10-digit VFD clock driven by a MAX6921 chip over VSPI SPI. Features automatic NTP time synchronization, weather display from OpenWeatherMap, a DS1307 battery-backed RTC, and a web-based configuration portal. Built on the shared `esp32_ntp_clock` IDF component framework also used by [MoodWhisperer](https://github.com/v01dma1n/MoodWhisperer).
+An ESP-IDF port of [GustavClock](https://github.com/v01dma1n/GustavClock) — a 10-digit VFD clock driven by a MAX6921 chip over VSPI SPI. Features automatic NTP time synchronization, weather display from OpenWeatherMap, and a web-based configuration portal. Built on the shared `esp32_ntp_clock` IDF component framework also used by [MoodWhisperer](https://github.com/v01dma1n/MoodWhisperer).
 
 ![GustavClock](photos/GustavClock.jpg)
 
@@ -8,7 +8,6 @@ An ESP-IDF port of [GustavClock](https://github.com/v01dma1n/GustavClock) — a 
 
 - **10-Digit VFD Display:** Driven by a MAX6921 chip over VSPI SPI with hardware-accurate digit multiplexing.
 - **Automatic Time Sync:** Connects to your WiFi and synchronizes from an NTP server with full timezone support.
-- **Battery-Backed RTC:** DS1307 seeds the system clock on boot so the display shows the correct time immediately, before WiFi connects.
 - **Weather Display:** Fetches current temperature (°F or °C) and humidity from OpenWeatherMap.
 - **Animated Scenes:** Cycles through date, time, temperature, and humidity using a playlist of animations — Slot Machine, Matrix, Scrolling Text.
 - **Web Configuration:** On first boot or when WiFi fails, the clock enters AP mode. Connect to its network and open `192.168.4.1` to configure all settings.
@@ -20,7 +19,7 @@ An ESP-IDF port of [GustavClock](https://github.com/v01dma1n/GustavClock) — a 
 | ESP32 module | ESP32-WROOM dev board |
 | VFD display | 10-digit Vacuum Fluorescent Display |
 | VFD driver | MAX6921 (VSPI: SCLK=18, MOSI=23, SS=5, BLANK=0) |
-| RTC | DS1307 over I2C (SDA=21, SCL=22) |
+| RTC | DS1307 over I2C (SDA=21, SCL=22) — supported in firmware, not installed |
 | Power | 5 V supply for ESP32 + VFD |
 
 ## 🧩 Component Architecture
@@ -78,7 +77,7 @@ idf.py -p /dev/ttyUSB0 flash monitor
 | Framework | Arduino / PlatformIO | ESP-IDF v5 |
 | SPI driver | `SPIClass` | `spi_master` IDF driver |
 | NVS / prefs | `Preferences` | `nvs_flash` IDF API |
-| RTC | not present | DS1307 (seeds clock on boot) |
+| RTC | not present | DS1307 supported in firmware, not currently installed |
 | AP trigger | double-reset via BootManager | double-reset via BootManager |
 | Weather | `IWeatherClock` + `openweather_client` | `fetchWeather()` from `weather_client.h` |
 | Timezone | separate state + country code fields | single `owm_city` field, e.g. `Chicago,IL,US` |
