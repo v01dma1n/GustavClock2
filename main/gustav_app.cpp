@@ -78,7 +78,7 @@ GustavApp::GustavApp()
 
 void GustavApp::setupHardware() {
     // AP trigger (BOOT button, hold 3 s).
-    if (AP_TRIGGER_GPIO >= 0) {
+    if constexpr (AP_TRIGGER_GPIO >= 0) {
         gpio_config_t io = {};
         io.pin_bit_mask = 1ULL << AP_TRIGGER_GPIO;
         io.mode         = GPIO_MODE_INPUT;
@@ -90,7 +90,7 @@ void GustavApp::setupHardware() {
     }
 
     // WiFi activity LED.
-    if (LED_GPIO >= 0) {
+    if constexpr (LED_GPIO >= 0) {
         gpio_config_t io = {};
         io.pin_bit_mask = 1ULL << LED_GPIO;
         io.mode         = GPIO_MODE_OUTPUT;
@@ -148,17 +148,19 @@ void GustavApp::loop() {
     BaseNtpClockApp::loop();
 
     // AP trigger: hold BOOT button for 3 s to enter AP mode from normal run.
-    if (AP_TRIGGER_GPIO >= 0 && _fsmManager && !_fsmManager->isInState("AP_MODE")) {
-        if (gpio_get_level(static_cast<gpio_num_t>(AP_TRIGGER_GPIO)) == 0) {
-            if (_apTriggerHeldSinceUs == 0)
-                _apTriggerHeldSinceUs = esp_timer_get_time();
-            else if (esp_timer_get_time() - _apTriggerHeldSinceUs >= 3'000'000) {
-                LOGINF("AP trigger held 3 s — requesting AP mode");
+    if constexpr (AP_TRIGGER_GPIO >= 0) {
+        if (_fsmManager && !_fsmManager->isInState("AP_MODE")) {
+            if (gpio_get_level(static_cast<gpio_num_t>(AP_TRIGGER_GPIO)) == 0) {
+                if (_apTriggerHeldSinceUs == 0)
+                    _apTriggerHeldSinceUs = esp_timer_get_time();
+                else if (esp_timer_get_time() - _apTriggerHeldSinceUs >= 3'000'000) {
+                    LOGINF("AP trigger held 3 s — requesting AP mode");
+                    _apTriggerHeldSinceUs = 0;
+                    _fsmManager->requestApMode();
+                }
+            } else {
                 _apTriggerHeldSinceUs = 0;
-                _fsmManager->requestApMode();
             }
-        } else {
-            _apTriggerHeldSinceUs = 0;
         }
     }
 
