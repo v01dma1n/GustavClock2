@@ -206,11 +206,11 @@ float GustavApp::getTempData() const {
     if (!_weatherManager) return UNSET_VALUE;
     const WeatherData& w = _weatherManager->getWeatherData();
     if (!w.valid) return UNSET_VALUE;
-    // Convert to Celsius if configured; weather_client always returns °F.
-    if (_appPrefs.config.tempUnit[0] == 'C') {
-        return (w.tempF - 32.0f) * 5.0f / 9.0f;
+    // weather_client always returns °C; convert to °F if configured.
+    if (_appPrefs.config.tempUnit[0] == 'F') {
+        return (w.tempC * 9.0f / 5.0f) + 32.0f;
     }
-    return w.tempF;
+    return w.tempC;
 }
 
 float GustavApp::getHumidityData() const {
