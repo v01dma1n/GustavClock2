@@ -12,6 +12,7 @@ idf_component_register(
     REQUIRES
         driver
         esp32_ntp_clock
+        esp_rom
 )
 
 target_compile_options(${COMPONENT_LIB} PUBLIC -std=gnu++17)

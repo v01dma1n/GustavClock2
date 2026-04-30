@@ -45,14 +45,22 @@ static void displayTask(void* /*pvParameters*/) {
     }
 }
 
-// Drives MAX6921 digit multiplexing at ~100 Hz (1 ms per digit × 10 digits).
-// Must run on a high-priority task on Core 1 for glitch-free display.
+// Drives MAX6921 digit multiplexing at ~100 Hz.
+// Writes all digits back-to-back in a tight loop — each writeNextDigit() call
+// uses esp_rom_delay_us() internally so every digit gets the same on-time
+// regardless of FreeRTOS tick granularity. The display is left blanked after
+// the loop, so task scheduling only affects the (dark) inter-frame gap.
 static void refreshTask(void* /*pvParameters*/) {
     IDisplayDriver& display = GustavApp::getInstance().getDisplay();
+    const int n = display.getDisplaySize();
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for (;;) {
-        display.writeNextDigit();
-        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
+        for (int i = 0; i < n; i++) {
+            display.writeNextDigit();
+        }
+        // Display is blanked here. Yield until start of next 10 ms frame so
+        // DisplayTask can update the frame buffer between frames.
+        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(10));
     }
 }
 

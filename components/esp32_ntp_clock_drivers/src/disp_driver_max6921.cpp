@@ -5,6 +5,7 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_rom_sys.h"
 
 #include <cctype>
 #include <cstring>
@@ -222,14 +223,23 @@ void DispDriverMAX6921::spiSend(unsigned long data) {
     spi_device_polling_transmit(_dev, &t);
 }
 
-// Called from RefreshTask every 1 ms. Blanks the display, loads one digit's
-// data into the MAX6921 shift register, then unblanks.
+// Called from RefreshTask in a tight loop (one call per digit, all digits per
+// frame). Loads the digit data while still blanked from the previous call,
+// then unblanks, holds for US_PER_DIGIT using a hardware-accurate busy-wait,
+// and re-blanks. The display is therefore always blanked when the task yields
+// between frames, so every digit gets exactly the same on-time independent of
+// FreeRTOS scheduling.
+static constexpr uint32_t US_PER_DIGIT = 900;
+
 void DispDriverMAX6921::writeNextDigit() {
     if (!_initialized || !_dev) return;
 
-    gpio_set_level(static_cast<gpio_num_t>(_blank), 1);  // blank
+    // SPI while still blanked (from previous call or begin()).
     spiSend(_gridMap[_currentDigit] | _buffer[_currentDigit]);
+
     gpio_set_level(static_cast<gpio_num_t>(_blank), 0);  // unblank
+    esp_rom_delay_us(US_PER_DIGIT);                       // hold — hardware-accurate
+    gpio_set_level(static_cast<gpio_num_t>(_blank), 1);  // blank
 
     _currentDigit = (_currentDigit + 1) % _digitCount;
 }
