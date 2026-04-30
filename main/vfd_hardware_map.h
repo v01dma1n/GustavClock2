@@ -51,10 +51,11 @@ static const Max6921SegmentMap VFD_SEGMENT_MAP = {
     .segDot = 0b00100000000000001000, // combined dot+comma on this glass
 };
 
-// --- AP trigger (BOOT button, hold 3 s) -------------------------------------
-// GPIO 0 = BOOT button on ESP32-WROOM (active-low, internal pull-up added).
-// Set to -1 to disable.
-constexpr int AP_TRIGGER_GPIO = 0;
+// --- AP trigger --------------------------------------------------------------
+// GPIO 0 is the BLANK line for the MAX6921 VFD driver (VSPI_BLANK above) so
+// it cannot double as a button input. Use double-reset (BootManager) to enter
+// AP mode instead — same mechanism as the original Arduino GustavClock.
+constexpr int AP_TRIGGER_GPIO = -1;
 
 // --- Built-in LED ------------------------------------------------------------
 // GPIO 2 = blue LED on ESP32-WROOM dev board. Flashes on WiFi activity.
