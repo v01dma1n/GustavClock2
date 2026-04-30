@@ -49,9 +49,10 @@ static void displayTask(void* /*pvParameters*/) {
 // Must run on a high-priority task on Core 1 for glitch-free display.
 static void refreshTask(void* /*pvParameters*/) {
     IDisplayDriver& display = GustavApp::getInstance().getDisplay();
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     for (;;) {
         display.writeNextDigit();
-        vTaskDelay(pdMS_TO_TICKS(1));
+        xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
     }
 }
 

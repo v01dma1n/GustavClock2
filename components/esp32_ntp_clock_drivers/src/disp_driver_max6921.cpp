@@ -126,9 +126,11 @@ void DispDriverMAX6921::begin() {
         return;
     }
 
-    // MAX6921: 1 MHz, SPI mode 0, CS active-low, MSB-first.
+    // MAX6921: 8 MHz, SPI mode 0, CS active-low, MSB-first.
+    // MAX6921 supports up to 26 MHz; 8 MHz keeps the 24-bit transfer under 3µs
+    // so blanking time per digit is negligible.
     spi_device_interface_config_t devcfg = {};
-    devcfg.clock_speed_hz = 1'000'000;
+    devcfg.clock_speed_hz = 8'000'000;
     devcfg.mode           = 0;
     devcfg.spics_io_num   = _ss;
     devcfg.queue_size     = 1;
@@ -217,7 +219,7 @@ void DispDriverMAX6921::spiSend(unsigned long data) {
     spi_transaction_t t = {};
     t.length    = 24;
     t.tx_buffer = bytes;
-    spi_device_transmit(_dev, &t);
+    spi_device_polling_transmit(_dev, &t);
 }
 
 // Called from RefreshTask every 1 ms. Blanks the display, loads one digit's
