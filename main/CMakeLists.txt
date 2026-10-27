@@ -13,7 +13,6 @@ idf_component_register(
         esp32_ntp_clock_drivers
         nvs_flash
         driver
-        esp_event
 )
 
 target_compile_options(${COMPONENT_LIB} PUBLIC -std=gnu++17)

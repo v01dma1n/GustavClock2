@@ -11,31 +11,12 @@
 #include "nvs_flash.h"
 #include "esp_netif.h"
 #include "esp_event.h"
-#include "mdns.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 static constexpr int APP_TASK_STACK = 12288;
 static constexpr int APP_TASK_PRIO  = 5;
 static constexpr int APP_TASK_CORE  = 0;
-
-static constexpr const char* MDNS_HOSTNAME = "gustav-clock";
-
-// Starts mDNS once the station has an IP so the clock resolves as
-// gustav-clock.local. Re-fires on every reconnect; init is one-shot.
-static void onGotIp(void* /*arg*/, esp_event_base_t /*base*/,
-                    int32_t /*id*/, void* /*data*/) {
-    static bool started = false;
-    if (started) return;
-    if (mdns_init() != ESP_OK) {
-        LOGINF("mDNS init failed");
-        return;
-    }
-    mdns_hostname_set(MDNS_HOSTNAME);
-    mdns_instance_name_set("GustavClock2");
-    started = true;
-    LOGINF("mDNS: %s.local", MDNS_HOSTNAME);
-}
 
 static void logTaskWatermarks() {
     static char buf[800];
@@ -126,8 +107,6 @@ extern "C" void app_main(void) {
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &onGotIp, nullptr, nullptr));
 
     xTaskCreatePinnedToCore(
         appTask, "AppTask",

@@ -21,11 +21,12 @@ GustavClock2 is an ESP-IDF v5 / C++17 project for a 10-digit VFD clock on an ESP
 ```
 main/                        — app-specific glue (GustavApp singleton, scene playlist, preferences)
 components/
-  esp32_ntp_clock/           — submodule: FSM engine, WiFi/NTP/weather/animation framework
+  esp32_wifi/                — submodule: WiFi connect, NVS prefs, captive portal, mDNS hostname
+  esp32_ntp_clock/           — submodule: FSM engine, NTP/weather/animation framework
   esp32_ntp_clock_drivers/   — submodule: MAX6921 VFD driver, DS1307 RTC driver, PT6315 driver
 ```
 
-Both `components/` subdirectories are git submodules (upstream: v01dma1n/ESP32NTPClock2 and v01dma1n/ESP32NTPClockDrivers2). Changes to shared behavior belong in those repos; changes specific to this clock belong in `main/`.
+All three `components/` subdirectories are git submodules (upstream: v01dma1n/ESP32WiFi2, v01dma1n/ESP32NTPClock2 and v01dma1n/ESP32NTPClockDrivers2). Changes to shared behavior belong in those repos; changes specific to this clock belong in `main/`.
 
 ### Task / core layout
 

@@ -192,11 +192,22 @@ void GustavApp::activateAccessPoint() {
 
     char waiting[64];
     snprintf(waiting, sizeof(waiting), "SETUP MODE - JOIN %s", GUSTAV_HOST_NAME);
-    char connected[] = "GOTO 192.168.4.1";
+    static const char connected[] = "GOTO 192.168.4.1";
 
     _displayManager->setAnimation(
         std::make_unique<ScrollingTextAnimation>(waiting, 180, false));
-    _apManagerConcrete.runBlockingLoop(*_displayManager, waiting, connected);
+
+    // The portal's HTTP/DNS servers run on their own tasks; this loop only
+    // swaps the banner once a phone joins. A /save reboots the device.
+    bool shownConnected = false;
+    for (;;) {
+        if (!shownConnected && _apManagerConcrete.isClientConnected()) {
+            shownConnected = true;
+            _displayManager->setAnimation(
+                std::make_unique<ScrollingTextAnimation>(connected, 180, false));
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
 }
 
 // --- Weather data getters ----------------------------------------------------
@@ -205,11 +216,11 @@ float GustavApp::getTempData() const {
     if (!_weatherManager) return UNSET_VALUE;
     const WeatherData& w = _weatherManager->getWeatherData();
     if (!w.valid) return UNSET_VALUE;
-    // weather_client always returns °C; convert to °F if configured.
-    if (_appPrefs.config.tempUnit[0] == 'F') {
-        return (w.tempC * 9.0f / 5.0f) + 32.0f;
+    // weather_client always returns °F; convert to °C if configured.
+    if (_appPrefs.config.tempUnit[0] == 'C') {
+        return (w.tempF - 32.0f) * 5.0f / 9.0f;
     }
-    return w.tempC;
+    return w.tempF;
 }
 
 float GustavApp::getHumidityData() const {
