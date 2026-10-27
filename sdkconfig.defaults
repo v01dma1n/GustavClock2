@@ -48,3 +48,6 @@ CONFIG_FREERTOS_IDLE_TASK_STACKSIZE=4096
 # --- C++ ---------------------------------------------------------------------
 CONFIG_COMPILER_CXX_EXCEPTIONS=n
 CONFIG_COMPILER_CXX_RTTI=n
+
+# --- Network hostname (DHCP + mDNS: gustav-clock.local) ----------------------
+CONFIG_LWIP_LOCAL_HOSTNAME="gustav-clock"
